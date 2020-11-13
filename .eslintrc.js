@@ -24,6 +24,9 @@ module.exports = {
         delimiter: 'semi',    // 'semi' or 'comma'
         requireLast: false,
       },
-    }]
+    }],
+    "no-tabs":"off",
+    "space-before-blocks": 0,
+    "key-spacing": 0
   }
 }

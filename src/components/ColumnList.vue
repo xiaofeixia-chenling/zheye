@@ -14,12 +14,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-export interface ColumnProps{
-  id: number
-  title: string
-  avatar: string
-  descriptions: string
-}
+import { ColumnProps } from '../../src/testData'
 
 export default defineComponent({
   name: 'ColumnList',
@@ -29,7 +24,7 @@ export default defineComponent({
       required: true
     }
   }
-  // setup(props){
+  // setup(props) {
 
   // },
 })
