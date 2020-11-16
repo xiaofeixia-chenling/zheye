@@ -5,7 +5,7 @@ module.exports = {
   },
   extends: [
     'plugin:vue/vue3-essential',
-    '@vue/standard',
+    // '@vue/standard',
     '@vue/typescript/recommended'
   ],
   parserOptions: {
@@ -27,6 +27,7 @@ module.exports = {
     }],
     "no-tabs":"off",
     "space-before-blocks": 0,
-    "key-spacing": 0
+    "key-spacing": 0,
+    "space-before-function-paren": 0
   }
 }
