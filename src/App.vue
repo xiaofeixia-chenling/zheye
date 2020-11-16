@@ -1,13 +1,15 @@
 <template>
 <div class="container">
   <Global-header :user="user"></Global-header>
-  <column-list :list="list"/>
+  <!-- <column-list :list="list"/> -->
+  <Login></Login>
 </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import ColumnList from './components/ColumnList.vue'
+// import ColumnList from './components/ColumnList.vue'
+import Login from './components/Login.vue'
 import GlobalHeader from './components/GlobalHeader.vue'
 import { testData } from '../src/testData'
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -25,10 +27,11 @@ export const testData2: UserProps = {
 export default defineComponent({
   name: 'App',
   components: {
-    ColumnList,
-    GlobalHeader
+    // ColumnList,
+    GlobalHeader,
+    Login
   },
-  setup(props, context) {
+  setup() {
   //  console.log(testData2)
     return {
       list :testData,
