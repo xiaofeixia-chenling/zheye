@@ -18,7 +18,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-// import ColumnList from './components/ColumnList.vue'
 import GlobalHeader from './components/GlobalHeader.vue'
 import { testData } from '../src/testData'
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -36,7 +35,6 @@ export const testData2: UserProps = {
 export default defineComponent({
   name: 'App',
   components: {
-    // ColumnList,
     GlobalHeader
   },
   setup() {

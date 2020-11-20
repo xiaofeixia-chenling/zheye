@@ -1,3 +1,4 @@
+import { createStore } from 'vuex'
 export interface UserProps {
   isLogin: boolean
   nickName?: string
@@ -13,7 +14,34 @@ export interface ImageProps {
   createdAt?: string
   fitUrl?: string
 }
+export interface ColumnProps {
+  _id: string
+  title: string
+  avatar?: ImageProps
+  description: string
+}
+export interface PostProps {
+  _id?: string
+  title: string
+  excerpt?: string
+  content?: string
+  image?: ImageProps | string
+  createdAt?: string
+  column: string
+  author?: string | UserProps
+  isHTML?: boolean
+}
 
-
-const store = {}
+const store = createStore({
+  state: {
+    count: 0
+  },
+  mutations: {
+    add(state){
+      state.count ++
+    }
+  },
+  actions:{},
+  getters:{}
+})
 export default store
