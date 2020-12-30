@@ -65,5 +65,5 @@ const testData2: {[key: string]: TestProps} = {
   2: { _id: '2', name: 'b' }
 }
 
-const result2 = objToArr(testData2)
+// const result2 = objToArr(testData2)
 // console.log(result2)

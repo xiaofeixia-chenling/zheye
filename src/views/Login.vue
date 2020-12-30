@@ -29,6 +29,8 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 import ValidateForm from '../components/ValidateForm.vue'
 import ValidateInput, { RulesProp } from '../components/ValidateInput.vue'
 
@@ -39,21 +41,33 @@ export default defineComponent({
     ValidateInput
   },
   setup(){
+    const router = useRouter()
+    const store = useStore()
     const inputRef = ref<any>()
-    const emailVal = ref('123@test.com')
-    const passwordVal = ref(123)
+    const emailVal = ref('')
+    const passwordVal = ref('')
 
     const emailRules: RulesProp = [
       { type: 'required', message: '电子邮箱地址不能为空' },
       { type: 'email', message: '请输入正确的电子邮箱格式' }
     ]
+    const passwordRules: RulesProp = [
+      { type: 'required', message: '密码不能为空' }
+    ]
     const onFormSubmit = (result: boolean)=> {
+      const payload = {
+        email: emailVal.value,
+        password: passwordVal.value
+      }
       if (result) {
-        console.log('调用登录接口')
+        router.push('/')
+        //触发vuex里mutaion对象里的属性方法
+        store.commit('login')
       }
     }
     return {
       emailRules,
+      passwordRules,
       onFormSubmit,
       emailVal,
       passwordVal

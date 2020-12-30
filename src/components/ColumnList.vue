@@ -1,6 +1,6 @@
 <template>
 <div class="row">
-  <div v-for="column in testData" :key="column.id" class="col-4 mb-4">
+  <div v-for="column in columnList" :key="column._id" class="col-4 mb-4">
     <div class="card h-100 shadow-sm">
       <div class="card-body text-center">
         <img :src="column.avatar" class="rounded-circle border border-light my-3" :alt="column.title">
@@ -14,18 +14,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
-import { ColumnProps } from '../../src/testData'
-import { testData } from '../testData'
+import { defineComponent, PropType,computed } from 'vue'
+import { ColumnProps } from '../store'
+import { addColumnAvatar } from '../helper'
 
 export default defineComponent({
   name: 'ColumnList',
   props: {
-   
+    list: {
+      type: Array as PropType<ColumnProps[]>,
+      required: true
+    }
   },
   setup(props) {
+    const columnList = computed(() => {
+      return props.list.map(column => {
+        addColumnAvatar(column, 50, 50)
+        return column
+      })
+    })
     return {
-      testData
+      columnList
     }
   },
 })
