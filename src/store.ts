@@ -60,7 +60,9 @@ const store = createStore<GlobalDataProps>({
   mutations: {
     login(state){
       state.user = { ...state.user, isLogin: true, name: 'viking'}
-      console.log(state.user)
+    },
+    createPost(state, newPost){
+      state.posts.data[newPost._id] = newPost
     }
   },
   actions:{},

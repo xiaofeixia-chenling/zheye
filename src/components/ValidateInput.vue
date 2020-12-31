@@ -32,10 +32,14 @@ interface RuleProp {
   validator?: () => boolean
 }
 export type RulesProp = RuleProp[]
+export type TagType = 'input' | 'textarea'
 export default defineComponent({
   props: {
     rules: Array as PropType<RulesProp>,
     modelValue: String,
+    tag:{
+      type: String as PropType<TagType>
+    }
   },
   inheritAttrs: false,
   setup(props, context){
