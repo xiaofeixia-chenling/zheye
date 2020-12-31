@@ -1,5 +1,8 @@
-import { createStore } from 'vuex'
-import { testData } from './testData'
+import { createStore, Commit } from 'vuex'
+import axios, { AxiosRequestConfig } from 'axios'
+axios.defaults.baseURL = 'http://api.vikingship.xyz/api'
+axios.defaults.headers['Access-Control-Allow-Origin'] = "*"
+import { arrToObj, objToArr } from './helper'
 export interface UserProps {
   isLogin: boolean
   name?: string
@@ -48,6 +51,17 @@ export interface GlobalDataProps {
   posts: { data: ListProps<PostProps>; loadedColumns: string[] }
   user: UserProps
 }
+const asyncAndCommit = async(url: string, mutationName: string,
+  commit: Commit, config: AxiosRequestConfig = { method: 'get' }, extraData?: any) => {
+  const { data } = await axios(url, config)
+  if (extraData) {
+    commit(mutationName, { data, extraData })
+  } else {
+    commit(mutationName, data)
+  }
+  return data
+}
+
 const store = createStore<GlobalDataProps>({
   state: {
     token: localStorage.getItem('token') || '',
@@ -63,16 +77,31 @@ const store = createStore<GlobalDataProps>({
     },
     createPost(state, newPost){
       state.posts.data[newPost._id] = newPost
+    },
+    fetchColumns(state, rawData){
+      const { data } = state.columns
+      const { list, count, currentPage } = rawData.data
+      state.columns = {
+        data: { ...data, ...arrToObj(list) },
+        total: count,
+        currentPage: currentPage * 1
+      }
     }
   },
-  actions:{},
+  actions:{
+    fetchColumns({ state, commit }, params = {}){
+      const { currentPage = 1, pageSize = 5 } = params
+      if (state.columns.currentPage < currentPage) {
+        return asyncAndCommit(`/columns?currentPage=${currentPage}&pageSize=${pageSize}`, 'fetchColumns', commit)
+      }
+    }
+  },
   getters:{
     biggerColumnsLengs(state){
       // return state.posts.data.filter(c => c._id > 2).length
     },
     getColumns: (state) => {
-      //return objToArr(state.columns.data)
-      return testData
+      return objToArr(state.columns.data)
     },
   }
 })
