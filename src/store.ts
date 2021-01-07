@@ -101,7 +101,13 @@ const store = createStore<GlobalDataProps>({
     },
     fetchPost(state, rawData){
       state.posts.data[rawData.data._id] = rawData.data
-    }
+    },
+    setLoading(state, status) {
+      state.loading = status
+    },
+    setError(state, e: GlobalErrorProps) {
+      state.error = e
+    },
   },
   actions:{
     fetchColumns({ state, commit }, params = {}){

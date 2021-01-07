@@ -1,6 +1,7 @@
 <template>
 <div class="container">
   <Global-header :user="currtUser"></Global-header>
+  <Loader v-if="isLoading"></Loader>
   <router-view></router-view>
   <footer class="text-center py-4 text-secondary bg-light mt-6">
     <small>
@@ -17,8 +18,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, computed,watch } from 'vue'
 import { useStore } from 'vuex'
+import Loader from './components/Loader.vue'
+import createMessage from './components/createMessage'
 import GlobalHeader from './components/GlobalHeader.vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { UserProps } from '../src/store'
@@ -26,13 +29,24 @@ import { UserProps } from '../src/store'
 export default defineComponent({
   name: 'App',
   components: {
-    GlobalHeader
+    GlobalHeader,
+    Loader
   },
   setup() {
     const store = useStore()
     const currtUser = computed(()=>store.state.user)
+    const isLoading = computed(() => store.state.loading)
+    const error = computed(() => store.state.error)
+    watch(() => error.value.status, () => {
+      const { status, message } = error.value
+      if (status && message) {
+        createMessage(message, 'error')
+      }
+    })
     return {
-      currtUser
+      currtUser,
+      isLoading,
+      error
     }
   }
 })
