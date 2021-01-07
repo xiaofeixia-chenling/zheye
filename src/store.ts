@@ -3,6 +3,11 @@ import axios, { AxiosRequestConfig } from 'axios'
 axios.defaults.baseURL = 'http://api.vikingship.xyz/api'
 axios.defaults.headers['Access-Control-Allow-Origin'] = "*"
 import { arrToObj, objToArr } from './helper'
+export interface ResponseType<P = {}> {
+  code: number
+  msg: string
+  data: P
+}
 export interface UserProps {
   isLogin: boolean
   name?: string
@@ -86,6 +91,16 @@ const store = createStore<GlobalDataProps>({
         total: count,
         currentPage: currentPage * 1
       }
+    },
+    fetchColumn(state, rawData){
+      state.columns.data[rawData.data._id] = rawData.data
+    },
+    fetchPosts(state, { data: rawData, extraData: columnId }){
+      state.posts.data = { ...state.posts.data, ...arrToObj(rawData.data.list) }
+      state.posts.loadedColumns.push(columnId)
+    },
+    fetchPost(state, rawData){
+      state.posts.data[rawData.data._id] = rawData.data
     }
   },
   actions:{
@@ -94,7 +109,25 @@ const store = createStore<GlobalDataProps>({
       if (state.columns.currentPage < currentPage) {
         return asyncAndCommit(`/columns?currentPage=${currentPage}&pageSize=${pageSize}`, 'fetchColumns', commit)
       }
-    }
+    },
+    fetchColumn({ state, commit }, cid){
+      if (!state.columns.data[cid]) {
+        return asyncAndCommit(`/columns/${cid}`, 'fetchColumn', commit)
+      }
+    },
+    fetchPosts({ state, commit }, cid){
+      if (!state.posts.loadedColumns.includes(cid)) {
+        return asyncAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit, { method: 'get' }, cid)
+      }
+    },
+    fetchPost({ state, commit }, id) {
+      const currentPost = state.posts.data[id]
+      if (!currentPost || !currentPost.content) {
+        return asyncAndCommit(`/posts/${id}`, 'fetchPost', commit)
+      } else {
+        return Promise.resolve({ data: currentPost })
+      }
+    },
   },
   getters:{
     biggerColumnsLengs(state){
@@ -103,6 +136,15 @@ const store = createStore<GlobalDataProps>({
     getColumns: (state) => {
       return objToArr(state.columns.data)
     },
+    getColumnById: (state) => (id: string) => {
+      return state.columns.data[id]
+    },
+    getPostsByCid:(state) =>(cid: string)=>{
+      return objToArr(state.posts.data).filter(post => post.column === cid)
+    },
+    getCurrentPost: (state) => (id: string) => {
+      return state.posts.data[id]
+    }
   }
 })
 export default store
