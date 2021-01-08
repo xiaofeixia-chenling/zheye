@@ -31,14 +31,14 @@ const router = createRouter({
       component: Login,
       meta:{redirectAlreadyLogin: true}
     },
-    {
-      path: '/column',
-      name: 'columnList',
-      component: ColumnList
-    },
+    // {
+    //   path: '/column',
+    //   name: 'columnList',
+    //   component: ColumnList
+    // },
     {
       path: '/column/:id',
-      name: 'columnDetail',
+      name: 'column',
       component: ColumnDetail
     },
     {
@@ -71,9 +71,15 @@ router.beforeEach((to, from, next) => {
         // store.commit('logout')
         next('login')
       })
+    }else {
+      if (requiredLogin) {
+        next('login')
+      } else {
+        next()
+      }
     }
   }else{
-    if (requiredLogin) {
+    if (redirectAlreadyLogin) {
       next('login')
     } else {
       next()

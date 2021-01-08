@@ -86,9 +86,6 @@ const store = createStore<GlobalDataProps>({
     fetchCurrentUser(state, rawData){
       state.user = {isLogin : true, ...rawData.data }
     },
-    createPost(state, newPost){
-      state.posts.data[newPost._id] = newPost
-    },
     fetchColumns(state, rawData){
       const { data } = state.columns
       const { list, count, currentPage } = rawData.data
@@ -107,6 +104,15 @@ const store = createStore<GlobalDataProps>({
     },
     fetchPost(state, rawData){
       state.posts.data[rawData.data._id] = rawData.data
+    },
+    updatePost(state, {data}){
+      state.posts.data[data._id] = data
+    },
+    deletePost(state, {data}){
+      delete state.posts.data[data._id]
+    },
+    createPost(state, newPost){
+      state.posts.data[newPost._id] = newPost
     },
     setLoading(state, status) {
       state.loading = status
@@ -150,6 +156,15 @@ const store = createStore<GlobalDataProps>({
       } else {
         return Promise.resolve({ data: currentPost })
       }
+    },
+    updatePost({ commit }, {id, payload}){
+      return asyncAndCommit(`/posts/${id}`, 'updatePost', commit, {method: 'patch', data: payload})
+    },
+    deletePost({ commit }, id){
+      return asyncAndCommit(`/posts/${id}`, 'deletePost', commit, {method: 'delete'})
+    },
+    createPost({ commit }, payload){
+      return asyncAndCommit(`/posts`, 'createPost', commit, {method: 'post', data: payload})
     },
   },
   getters:{

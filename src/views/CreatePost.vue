@@ -58,6 +58,7 @@ import { GlobalDataProps, PostProps} from '../store'
 import ValidateInput, { RulesProp } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
 import { beforeUploadCheck } from '../helper'
+import createMessage from '../components/createMessage'
 export default defineComponent({
   name: 'create',
   components: {
@@ -71,7 +72,7 @@ export default defineComponent({
     const route = useRoute()
     const isEditMode = !!route.query.id
     const store = useStore<GlobalDataProps>()
-   
+    
     const titleRules: RulesProp = [
       { type: 'required', message: '文章标题不能为空' }
     ]
@@ -79,7 +80,30 @@ export default defineComponent({
     const contentRules: RulesProp = [
       { type: 'required', message: '文章详情不能为空' }
     ]
-    
+    const onFormSubmit = (result: boolean) => {
+      if (result) {
+        const { column, _id } = store.state.user
+        if (column) {
+          const newPost: PostProps = {
+            title: titleVal.value,
+            content: contentVal.value,
+            column,
+            author: _id
+          }
+          const actionName = isEditMode ? 'updatePost' : 'createPost'
+          const sendData = isEditMode ? {
+            id: route.query.id,
+            payload: newPost
+          } : newPost
+          store.dispatch(actionName, sendData).then(() => {
+            createMessage('发表成功，2秒后跳转到文章', 'success', 2000)
+            setTimeout(() => {
+              router.push({ path: '/column', params: { id: column } })
+            }, 2000)
+          })
+        }
+      }
+    }
     
     return {
       titleRules,
@@ -87,7 +111,8 @@ export default defineComponent({
       contentVal,
       contentRules,
       uploadedData,
-      isEditMode
+      isEditMode,
+      onFormSubmit
     }
   }
 })

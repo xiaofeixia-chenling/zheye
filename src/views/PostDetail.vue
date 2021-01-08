@@ -1,6 +1,11 @@
 <template>
   <div class="post-detail-page">
-    
+    <modal title="删除文章" :visible="modalIsVisible"
+      @modal-on-close="modalIsVisible = false"
+      @modal-on-confirm="hideAndDelete"
+    >
+      <p>确定要删除这篇文章吗？</p>
+    </modal>
     <article class="w-75 mx-auto mb-5 pb-3" v-if="currentPost">
       <img :src="currentImageUrl" alt="currentPost.title" class="rounded-lg img-fluid my-4" v-if="currentImageUrl">
       <h2 class="mb-4">{{currentPost.title}}</h2>
@@ -31,12 +36,11 @@ import { defineComponent, onMounted, computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
 import { GlobalDataProps, PostProps, ImageProps, UserProps, ResponseType } from '../store'
-
-
+import Modal from '../components/Modal.vue'
 export default defineComponent({
   name: 'post-detail',
   components: {
-    
+    Modal
   },
   setup() {
     const store = useStore<GlobalDataProps>()
@@ -74,7 +78,6 @@ export default defineComponent({
     const hideAndDelete = () => {
       modalIsVisible.value = false
       store.dispatch('deletePost', currentId).then((rawData: ResponseType<PostProps>) => {
-        
         setTimeout(() => {
           router.push({ name: 'column', params: { id: rawData.data.column } })
         }, 2000)
