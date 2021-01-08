@@ -33,6 +33,7 @@ import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import ValidateForm from '../components/ValidateForm.vue'
 import ValidateInput, { RulesProp } from '../components/ValidateInput.vue'
+import createMessage from '../components/createMessage'
 
 export default defineComponent({
   name: 'Login',
@@ -60,9 +61,14 @@ export default defineComponent({
         password: passwordVal.value
       }
       if (result) {
-        router.push('/')
-        //触发vuex里mutaion对象里的属性方法
-        store.commit('login')
+        store.dispatch('loginAndFetch', payload).then(data =>{
+          createMessage('登录成功 2秒后跳转首页', 'success')
+          setTimeout(() => {
+            router.push('/')
+          }, 2000)
+        }).catch(e => {
+          console.log(e)
+        })
       }
     }
     return {

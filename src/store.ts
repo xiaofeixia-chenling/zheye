@@ -77,8 +77,14 @@ const store = createStore<GlobalDataProps>({
     user: { isLogin: false }
   },
   mutations: {
-    login(state){
-      state.user = { ...state.user, isLogin: true, name: 'viking'}
+    login(state, rawData){
+      const { token } = rawData.data
+      state.token = token
+      localStorage.setItem('token', token)
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`
+    },
+    fetchCurrentUser(state, rawData){
+      state.user = {isLogin : true, ...rawData.data }
     },
     createPost(state, newPost){
       state.posts.data[newPost._id] = newPost
@@ -110,6 +116,17 @@ const store = createStore<GlobalDataProps>({
     },
   },
   actions:{
+    login({ commit }, payload){
+      return asyncAndCommit(`/user/login`, 'login', commit, { method: 'post', data: payload})
+    },
+    fetchCurrentUser({ commit }){
+      return asyncAndCommit(`/user/current`, 'fetchCurrentUser', commit)
+    },
+    loginAndFetch({ dispatch }, loginData){
+      return dispatch('login', loginData).then(() => {
+        return dispatch('fetchCurrentUser')
+      })
+    },
     fetchColumns({ state, commit }, params = {}){
       const { currentPage = 1, pageSize = 5 } = params
       if (state.columns.currentPage < currentPage) {
