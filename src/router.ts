@@ -4,7 +4,6 @@ import store from './store'
 import Home from './views/Home.vue'
 import Login from './views/Login.vue'
 import ColumnDetail from './views/ColumnDetail.vue'
-import ColumnList from './components/ColumnList.vue'
 import Create from './views/CreatePost.vue'
 import PostDetail from './views/PostDetail.vue'
 import Signup from './views/Signup.vue'
@@ -32,11 +31,6 @@ const router = createRouter({
       component: Login,
       meta:{redirectAlreadyLogin: true}
     },
-    // {
-    //   path: '/column',
-    //   name: 'columnList',
-    //   component: ColumnList
-    // },
     {
       path: '/column/:id',
       name: 'column',
@@ -55,7 +49,7 @@ const router = createRouter({
     },
     {
       path: '/signup',
-      name: 'post',
+      name: 'signup',
       component: Signup
     }
   ]
@@ -63,20 +57,33 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const { user, token } = store.state
   const { requiredLogin, redirectAlreadyLogin } = to.meta
-  if(!user.isLogin){
-    if(token){
+  if (!user.isLogin) {
+    if (token) {
       axios.defaults.headers.common.Authorization = `Bearer ${token}`
       store.dispatch('fetchCurrentUser').then(() => {
-        redirectAlreadyLogin? next('/') : next()
+        if (redirectAlreadyLogin) {
+          next('/')
+        } else {
+          next()
+        }
       }).catch(e => {
+        console.error(e)
         store.commit('logout')
-        next('/login')
+        next('login')
       })
-    }else {
-      requiredLogin ? next('/login') : next()
+    } else {
+      if (requiredLogin) {
+        next('login')
+      } else {
+        next()
+      }
     }
-  }else{
-    requiredLogin ? next('/login') : next()
+  } else {
+    if (redirectAlreadyLogin) {
+      next('/')
+    } else {
+      next()
+    }
   }
 })
 

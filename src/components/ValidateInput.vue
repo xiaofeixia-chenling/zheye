@@ -5,8 +5,7 @@
       class="form-control"
       :class="{'is-invalid': inputRef.error}"
       @blur="validateInput"
-      :value="inputRef.val"
-      @input="updateValue"
+      v-model="inputRef.val"
       v-bind="$attrs"
     >
     <textarea
@@ -23,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, reactive, onMounted } from 'vue'
+import { defineComponent, PropType, reactive, onMounted,computed } from 'vue'
 import { emitter } from './ValidateForm.vue'
 const emailReg = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
 interface RuleProp {
@@ -37,14 +36,17 @@ export default defineComponent({
   props: {
     rules: Array as PropType<RulesProp>,
     modelValue: String,
-    tag:{
-      type: String as PropType<TagType>
-    }
+    tag:{type: String as PropType<TagType>}
   },
   inheritAttrs: false,
   setup(props, context){
     const inputRef = reactive({
-      val: props.modelValue || '',
+      val: computed({
+        get: () => props.modelValue || '',
+        set: val => {
+          context.emit('update:modelValue', val)
+        }
+      }),
       error: false,
       message: ''
     })
@@ -73,18 +75,17 @@ export default defineComponent({
       }
       return true
     }
-    const updateValue = (e: KeyboardEvent) => {
-      const targetVaule = (e.target as HTMLInputElement).value
-      inputRef.val = targetVaule
-      context.emit('update:modelValue', targetVaule)
-    }
+    // const updateValue = (e: KeyboardEvent) => {
+    //   const targetVaule = (e.target as HTMLInputElement).value
+    //   inputRef.val = targetVaule
+    //   context.emit('update:modelValue', targetVaule)
+    // }
     onMounted(() => {
       emitter.emit('form-item-created', validateInput)
     })
     return {
       inputRef,
-      validateInput,
-      updateValue
+      validateInput
     }
   }
 })

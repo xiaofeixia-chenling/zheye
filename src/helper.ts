@@ -41,6 +41,10 @@ export function beforeUploadCheck(file: File, condition: CheckCondition) {
     error
   }
 }
+interface TestProps {
+  _id: string
+  name: string
+}
 
 export const arrToObj = <T extends { _id?: string }>(arr: Array<T>) => {
   return arr.reduce((prev, current) => {

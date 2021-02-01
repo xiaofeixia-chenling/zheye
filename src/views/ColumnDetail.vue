@@ -20,7 +20,6 @@ import { useStore } from 'vuex'
 import { GlobalDataProps,ColumnProps } from '../store'
 import { addColumnAvatar } from '../helper'
 import PostList from '../components/PostList.vue' 
-import { testData, testPosts } from '../testData'
 
 export default defineComponent({
   name: 'ColumnDetail',

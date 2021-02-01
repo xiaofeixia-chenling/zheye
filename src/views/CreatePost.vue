@@ -82,6 +82,18 @@ export default defineComponent({
     const contentRules: RulesProp = [
       { type: 'required', message: '文章详情不能为空' }
     ]
+    onMounted(() => {
+      if (isEditMode) {
+        store.dispatch('fetchPost', route.query.id).then((rawData: ResponseType<PostProps>) => {
+          const currentPost = rawData.data
+          if (currentPost.image) {
+            uploadedData.value = { data: currentPost.image }
+          }
+          titleVal.value = currentPost.title || ''
+          contentVal.value = currentPost.content || ''
+        })
+      }
+    })
     const onFormSubmit = (result: boolean) => {
       if (result) {
         const { column, _id } = store.state.user
@@ -103,7 +115,7 @@ export default defineComponent({
           store.dispatch(actionName, sendData).then(() => {
             createMessage('发表成功，2秒后跳转到文章', 'success', 2000)
             setTimeout(() => {
-              router.push({ path: '/column', params: { id: column } })
+              router.push({ name: 'column', params: { id: column } })
             }, 2000)
           })
         }
@@ -112,7 +124,6 @@ export default defineComponent({
     const uploadCheck = ((file: File) =>{
       const result = beforeUploadCheck(file, { format: ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'], size: 1 })
       const { passed, error } = result
-      const isJPG = file.type === 'image/jpeg'
       if (error === 'format') {
         createMessage('非图片!', 'error')
       }
