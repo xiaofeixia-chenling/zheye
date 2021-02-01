@@ -67,6 +67,12 @@ const asyncAndCommit = async(url: string, mutationName: string,
   return data
 }
 
+/**
+ * 测试用户
+ * 111@test.com
+ * 111111
+ * 请用这个号登陆方能发布文章
+ */
 const store = createStore<GlobalDataProps>({
   state: {
     token: localStorage.getItem('token') || '',
@@ -82,6 +88,12 @@ const store = createStore<GlobalDataProps>({
       state.token = token
       localStorage.setItem('token', token)
       axios.defaults.headers.common.Authorization = `Bearer ${token}`
+    },
+    logout(state) {
+      state.token = ''
+      state.user = { isLogin: false }
+      localStorage.remove('token')
+      delete axios.defaults.headers.common.Authorization
     },
     fetchCurrentUser(state, rawData){
       state.user = {isLogin : true, ...rawData.data }

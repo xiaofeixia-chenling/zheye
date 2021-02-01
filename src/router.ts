@@ -7,6 +7,7 @@ import ColumnDetail from './views/ColumnDetail.vue'
 import ColumnList from './components/ColumnList.vue'
 import Create from './views/CreatePost.vue'
 import PostDetail from './views/PostDetail.vue'
+import Signup from './views/Signup.vue'
 
 const routerHistory = createWebHistory()
 const router = createRouter({
@@ -51,6 +52,11 @@ const router = createRouter({
       path: '/posts/:id',
       name: 'post',
       component: PostDetail
+    },
+    {
+      path: '/signup',
+      name: 'post',
+      component: Signup
     }
   ]
 })
@@ -61,29 +67,16 @@ router.beforeEach((to, from, next) => {
     if(token){
       axios.defaults.headers.common.Authorization = `Bearer ${token}`
       store.dispatch('fetchCurrentUser').then(() => {
-        if (redirectAlreadyLogin) {
-          next('/')
-        } else {
-          next()
-        }
+        redirectAlreadyLogin? next('/') : next()
       }).catch(e => {
-        console.error(e)
-        // store.commit('logout')
-        next('login')
+        store.commit('logout')
+        next('/login')
       })
     }else {
-      if (requiredLogin) {
-        next('login')
-      } else {
-        next()
-      }
+      requiredLogin ? next('/login') : next()
     }
   }else{
-    if (redirectAlreadyLogin) {
-      next('login')
-    } else {
-      next()
-    }
+    requiredLogin ? next('/login') : next()
   }
 })
 

@@ -19,7 +19,7 @@
       </template>
       <template #uploaded="dataProps">
         <div class="uploaded-area">
-          <img :src="dataProps.uploadedData.data.url">
+          <img :src="dataProps.uploadedData.data.url" width="500">
           <h3>点击重新上传</h3>
         </div>
       </template>
@@ -54,16 +54,18 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
-import { GlobalDataProps, PostProps} from '../store'
+import { GlobalDataProps, PostProps,ResponseType, ImageProps} from '../store'
 import ValidateInput, { RulesProp } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
 import { beforeUploadCheck } from '../helper'
 import createMessage from '../components/createMessage'
+import Uploader from '../components/Uploader.vue'
 export default defineComponent({
   name: 'create',
   components: {
     ValidateInput,
     ValidateForm,
+    Uploader
   },
   setup() {
     const uploadedData = ref()
@@ -72,7 +74,7 @@ export default defineComponent({
     const route = useRoute()
     const isEditMode = !!route.query.id
     const store = useStore<GlobalDataProps>()
-    
+    let imageId = ''
     const titleRules: RulesProp = [
       { type: 'required', message: '文章标题不能为空' }
     ]
@@ -90,6 +92,9 @@ export default defineComponent({
             column,
             author: _id
           }
+          if (imageId) {
+            newPost.image = imageId
+          }
           const actionName = isEditMode ? 'updatePost' : 'createPost'
           const sendData = isEditMode ? {
             id: route.query.id,
@@ -104,7 +109,24 @@ export default defineComponent({
         }
       }
     }
-    
+    const uploadCheck = ((file: File) =>{
+      const result = beforeUploadCheck(file, { format: ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'], size: 1 })
+      const { passed, error } = result
+      const isJPG = file.type === 'image/jpeg'
+      if (error === 'format') {
+        createMessage('非图片!', 'error')
+      }
+      if (error === 'size') {
+        createMessage('上传图片大小不能超过 1Mb', 'error')
+      }
+      return passed
+    })
+    const handleFileUploaded = (rawData: ResponseType<ImageProps>) => {
+      if (rawData.data._id) {
+        imageId = rawData.data._id
+      }
+    }
+  
     return {
       titleRules,
       titleVal,
@@ -112,7 +134,9 @@ export default defineComponent({
       contentRules,
       uploadedData,
       isEditMode,
-      onFormSubmit
+      onFormSubmit,
+      uploadCheck,
+      handleFileUploaded
     }
   }
 })
