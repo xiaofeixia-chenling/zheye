@@ -146,7 +146,7 @@ const store = createStore<GlobalDataProps>({
       })
     },
     fetchColumns({ state, commit }, params = {}){
-      const { currentPage = 1, pageSize = 5 } = params
+      const { currentPage = 1, pageSize = 3 } = params
       if (state.columns.currentPage < currentPage) {
         return asyncAndCommit(`/columns?currentPage=${currentPage}&pageSize=${pageSize}`, 'fetchColumns', commit)
       }
@@ -180,9 +180,6 @@ const store = createStore<GlobalDataProps>({
     },
   },
   getters:{
-    biggerColumnsLengs(state){
-      // return state.posts.data.filter(c => c._id > 2).length
-    },
     getColumns: (state) => {
       return objToArr(state.columns.data)
     },
